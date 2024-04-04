@@ -18,7 +18,8 @@ class CalsTests(SimpleTestCase):
     def test_google(self):
         client = APIClient()
         res = client.get('https://google.com')
-        #it normally block outgoing requests to prevent tests from making real requests to external services.
+        # it normally block outgoing requests to prevent tests from making real
+        # requests to external services.
         self.assertEqual(res.status_code, 404)
 
     def test_google_mocked(self):
