@@ -2,3 +2,4 @@ Django>=3.2.4,<3.3
 djangorestframework>=3.12.4,<3.13
 responses==0.17.0
 requests-mock==1.12.1
+psycopg2>=2.8.6,<2.9
