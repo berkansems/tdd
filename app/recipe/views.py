@@ -30,11 +30,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.UpdateModelMixin,
-                 mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 mixins.DestroyModelMixin,
-                 viewsets.GenericViewSet):
+class BaseRecipeAttrViewSet(mixins.UpdateModelMixin,
+                            mixins.ListModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.DestroyModelMixin,
+                            viewsets.GenericViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user).order_by('-name')
+
+
+class TagViewSet(BaseRecipeAttrViewSet):
     '''
     if we directly inherit from viewsets.ModelViewSet it handles tag-detail endpoint also  because it
     has inheritet from :
@@ -45,18 +53,8 @@ class TagViewSet(mixins.UpdateModelMixin,
     '''
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(BaseRecipeAttrViewSet):
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-name')
