@@ -13,18 +13,20 @@ from decimal import Decimal
 TAGS_URL = reverse('recipe:tag-list')
 RECIPES_URL = reverse('recipe:recipe-list')
 
-def tag_url(tag_id):
 
+def tag_url(tag_id):
     return reverse('recipe:tag-detail', args=[tag_id])
+
 
 def recipe_url(recipe_id):
 
     return reverse('recipe:recipe-detail', args=[recipe_id])
 
-def create_user(email='test@example.com', password='<PASSWORD>'):
 
+def create_user(email='test@example.com', password='<PASSWORD>'):
     '''create a test user'''
     return get_user_model().objects.create_user(email=email, password=password)
+
 
 def create_recipe(**params):
 
@@ -40,6 +42,7 @@ def create_recipe(**params):
 
     return Recipe.objects.create(**default)
 
+
 def create_tag(user, tag_name):
 
     return Tag.objects.create(user=user, name=tag_name)
@@ -53,6 +56,7 @@ class PublicTagTestApi(TestCase):
     def test_auth_required(self):
         res = self.client.get(TAGS_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateTagTestApi(TestCase):
 
@@ -96,7 +100,6 @@ class PrivateTagTestApi(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         tag.refresh_from_db()
         self.assertEqual(tag.name, 'new name')
-
 
     def test_delete_tag(self):
 

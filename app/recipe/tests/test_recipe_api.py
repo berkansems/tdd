@@ -150,7 +150,7 @@ class PrivateRecipeApiTests(TestCase):
 
     def test_existing_of_ingredients(self):
         recipe = create_recipe(user=self.user)
-        ingredient_1 =Ingredient.objects.create(user=self.user, name='Kale')
+        ingredient_1 = Ingredient.objects.create(user=self.user, name='Kale')
         ingredient_2 = Ingredient.objects.create(user=self.user, name='Salt')
         recipe.ingredients.add(ingredient_1, ingredient_2)
         serializer = IngredientSerializer(Ingredient.objects.all().order_by('name'), many=True)
@@ -211,7 +211,7 @@ class PrivateRecipeApiTests(TestCase):
         res = self.client.post(RECIPES_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
-        payload = {'ingredients' : [{'name': 'sut'}]}
+        payload = {'ingredients': [{'name': 'sut'}]}
         res = self.client.patch(detail_url(recipe.id), payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         recipe.refresh_from_db()
@@ -229,7 +229,7 @@ class PrivateRecipeApiTests(TestCase):
         res = self.client.post(RECIPES_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
-        payload = {'ingredients' : []}
+        payload = {'ingredients': []}
         res = self.client.patch(detail_url(recipe.id), payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         recipe.refresh_from_db()

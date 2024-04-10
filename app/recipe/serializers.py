@@ -5,6 +5,7 @@ from core.models import (
     Ingredient
 )
 
+
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
@@ -72,7 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
 
 
 class RecipeDetailSerializer(RecipeSerializer):
