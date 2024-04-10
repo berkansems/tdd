@@ -20,6 +20,7 @@ for put patch update it set name to recipe-detail
 '''
 router.register('recipes', views.RecipeViewSet)
 router.register('tags', views.TagViewSet)
+router.register('ingredients', views.IngredientViewSet)
 
 app_name = 'recipe'
 
