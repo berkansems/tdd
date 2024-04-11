@@ -23,6 +23,7 @@ class CalsTests(SimpleTestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_google_mocked(self):
+        ''' by default django APIClient does not let us to makek real http request so we need to mock it'''
         with requests_mock.Mocker() as m:
             m.get('https://google.com', status_code=200)
             response = requests.get('https://google.com')
