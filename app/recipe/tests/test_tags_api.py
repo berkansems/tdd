@@ -209,3 +209,60 @@ class PrivateTagTestApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.count(), 0)
+
+    def test_tags_assigned_to_recipe(self):
+        tag1 = Tag.objects.create(user=self.user, name='Breakfast')
+        tag2 = Tag.objects.create(user=self.user, name='Lunch')
+        tag3 = Tag.objects.create(user=self.user, name='Dessert')
+        recipe1 = Recipe.objects.create(
+            title='Apple Crumble',
+            time_minutes=5,
+            price=Decimal('4.50'),
+            user=self.user,
+        )
+        recipe1.tags.add(tag1)
+        recipe2 = Recipe.objects.create(
+            title='Narada',
+            time_minutes=15,
+            price=Decimal('1.50'),
+            user=self.user,
+        )
+        recipe2.tags.add(tag2)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+
+        ser1 = TagSerializer(tag1)
+        ser2 = TagSerializer(tag2)
+        ser3 = TagSerializer(tag3)
+
+        self.assertIn(ser1.data, res.data)
+        self.assertIn(ser2.data, res.data)
+        self.assertNotIn(ser3.data, res.data)
+
+    def test_filtered_tags_unique(self):
+        """Test filtered tags returns a unique list."""
+        tag1 = Tag.objects.create(user=self.user, name='Breakfast')
+        tag2 = Tag.objects.create(user=self.user, name='Lunch')
+        tag3 = Tag.objects.create(user=self.user, name='Dessert')
+        recipe1 = Recipe.objects.create(
+            title='Apple Crumble',
+            time_minutes=5,
+            price=Decimal('4.50'),
+            user=self.user,
+        )
+
+        recipe2 = Recipe.objects.create(
+            title='Narada',
+            time_minutes=15,
+            price=Decimal('1.50'),
+            user=self.user,
+        )
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag1)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+

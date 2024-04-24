@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.test import TestCase
 from django.urls import reverse
-from core.models import Recipe, Ingredient
+from core.models import Recipe, Ingredient, Tag
 from django.contrib.auth import get_user_model
 from recipe.serializers import RecipeSerializer, RecipeDetailSerializer, IngredientSerializer
 import tempfile
@@ -244,6 +244,48 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         recipe.refresh_from_db()
         self.assertEqual(recipe.ingredients.count(), 0)
+
+    def test_filter_by_tags(self):
+        """test filter recipe by tags."""
+        r1 = Recipe.objects.create(user=self.user, title='Salt', price=2.33)
+        r2 = Recipe.objects.create(user=self.user, title='Sut', price=23.33)
+        tag1 = Tag.objects.create(user=self.user, name='Vegan')
+        tag2 = Tag.objects.create(user=self.user, name='Meat')
+        r1.tags.add(tag1)
+        r2.tags.add(tag2)
+        r3 = Recipe.objects.create(user=self.user, title='Paa', price=10.00)
+
+        res = self.client.get(RECIPES_URL, {'tags': f'{tag1.id}, {tag2.id}'})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
+    def test_filter_by_ingredients(self):
+        """test filter recipe by tags."""
+        r1 = Recipe.objects.create(user=self.user, title='Salt', price=2.33)
+        r2 = Recipe.objects.create(user=self.user, title='Sut', price=23.33)
+        ingredient1 = Ingredient.objects.create(user=self.user, name='Vegan')
+        ingredient2 = Ingredient.objects.create(user=self.user, name='Meat')
+        r1.ingredients.add(ingredient1)
+        r2.ingredients.add(ingredient2)
+        r3 = Recipe.objects.create(user=self.user, title='Paa', price=10.00)
+
+        res = self.client.get(RECIPES_URL, {'ingredients': f'{ingredient1.id},{ingredient2.id}'})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+
+        s1 = RecipeSerializer(r1)
+        s2 = RecipeSerializer(r2)
+        s3 = RecipeSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
 
 
 class ImageUploadTests(TestCase):
